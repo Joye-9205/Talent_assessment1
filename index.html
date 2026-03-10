@@ -58,8 +58,8 @@
 <div id="auth-overlay">
     <div class="auth-box">
         <h2 style="margin:0; color:#FF7675;">输入验证码</h2>
-        <p style="color:#999; font-size:13px; margin-top:8px;">请输入 8888 开启测评</p>
-        <input type="number" id="auth-input" placeholder="请输入4位验证码">
+        <p style="color:#999; font-size:13px; margin-top:8px;">请输入验证码开启测评</p>
+        <input type="number" id="auth-input" placeholder="请输入验证码">
         <button id="auth-btn">进入系统</button>
         <p id="auth-error" style="color:red; font-size:12px; margin-top:10px; display:none;">验证码错误，请重试</p>
     </div>
@@ -94,7 +94,7 @@
 
 <script>
 // 1. 验证逻辑 (修正版)
-const CORRECT_CODE = "8888";
+const CORRECT_CODE = "0520";
 const authBtn = document.getElementById('auth-btn');
 
 authBtn.addEventListener('click', function() {
