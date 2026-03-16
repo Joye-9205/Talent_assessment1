@@ -6,174 +6,340 @@
     <title>3-4岁幼儿潜力深度测评</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --primary: #FF7675; --secondary: #74B9FF; --success: #55E6C1; --bg: #FFFBFB; --text: #2D3436; --card-bg: rgba(255, 255, 255, 0.95); }
+        :root {
+            --primary: #FF7675;
+            --secondary: #74B9FF;
+            --success: #55E6C1;
+            --accent: #A29BFE;
+            --text-main: #2D3436;
+            --text-sub: #636E72;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; user-select: none; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #FFF5F5 0%, #FFFBFB 100%); margin: 0; padding: 15px; color: var(--text); line-height: 1.6; }
-        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
-        .auth-box { background: white; padding: 40px 30px; border-radius: 30px; width: 88%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-        .auth-box input { width: 100%; padding: 15px; border: 2px solid #F1F1F1; border-radius: 15px; margin: 25px 0; font-size: 20px; text-align: center; outline: none; background: #FAFAFA; }
-        .auth-box button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; }
-        #main-content { display: none; max-width: 650px; margin: auto; background: var(--card-bg); padding: 25px; border-radius: 35px; box-shadow: 0 10px 50px rgba(255, 118, 117, 0.1); }
-        header { text-align: center; margin-bottom: 35px; }
-        h1 { color: var(--primary); margin: 0; font-size: 26px; font-weight: 800; }
-        .subtitle { color: #A0A0A0; font-size: 14px; margin-top: 8px; }
-        .question { margin-bottom: 25px; padding: 20px; border-radius: 20px; background: white; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .options label { display: block; margin: 10px 0; padding: 14px 18px; border: 1.5px solid #F5F6FA; border-radius: 15px; background: #FFF; font-size: 14px; cursor: pointer; transition: all 0.25s ease; position: relative; }
+
+        body {
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(160deg, #F9FAFB 0%, #FFF5F5 100%);
+            margin: 0; padding: 15px; color: var(--text-main); line-height: 1.6;
+        }
+
+        /* 验证界面 */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .auth-box {
+            background: white; padding: 40px 30px; border-radius: 35px;
+            width: 90%; max-width: 360px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .auth-box h2 { color: var(--primary); margin: 0; font-size: 24px; font-weight: 800; }
+        .auth-box input {
+            width: 100%; padding: 16px; border: 2px solid #F1F2F6; border-radius: 18px;
+            margin: 30px 0; font-size: 22px; text-align: center; outline: none;
+            transition: all 0.3s; background: #F8F9FA; letter-spacing: 4px;
+        }
+        .auth-box input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(255,118,117,0.1); }
+        .auth-box button {
+            width: 100%; padding: 18px; background: var(--primary); color: white;
+            border: none; border-radius: 18px; font-size: 18px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 10px 15px -3px rgba(255,118,117,0.4);
+        }
+
+        /* 主体布局 */
+        #main-content {
+            display: none; max-width: 680px; margin: auto;
+            background: var(--glass); backdrop-filter: blur(10px);
+            padding: 25px; border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+        }
+
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: var(--primary); font-size: 28px; margin: 0; letter-spacing: -0.5px; }
+        .badge { display: inline-block; padding: 4px 12px; background: rgba(255,118,117,0.1); color: var(--primary); border-radius: 8px; font-size: 12px; margin-top: 10px; font-weight: 600; }
+
+        /* 题目设计 */
+        .question {
+            margin-bottom: 25px; padding: 25px; border-radius: 28px;
+            background: white; border: 1px solid #F1F2F6;
+            transition: transform 0.3s;
+        }
+        .question p { font-weight: 700; margin-bottom: 18px; font-size: 17px; color: #333; }
+        .options label {
+            display: block; margin: 12px 0; padding: 16px 20px;
+            border: 1.5px solid #F1F2F6; border-radius: 16px;
+            font-size: 15px; cursor: pointer; transition: all 0.2s; position: relative;
+        }
         input[type="radio"] { display: none; }
         input[type="radio"]:checked + span { color: var(--primary); font-weight: 600; }
-        input[type="radio"]:checked + span::after { content: "✓"; position: absolute; right: 18px; font-weight: bold; }
-        .btn-submit { width: 100%; padding: 20px; background: linear-gradient(135deg, #FF7675, #FF9F9E); color: white; border: none; border-radius: 20px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; box-shadow: 0 10px 20px rgba(255,118,117,0.3); }
-        #report { display: none; margin-top: 40px; }
-        .result-header { text-align: center; background: #FFF; padding: 30px 20px; border-radius: 25px; margin-bottom: 25px; border: 1px solid #FDECEC; }
-        .chart-container { background: white; border-radius: 25px; padding: 20px; margin-bottom: 25px; border: 1px solid #F0F0F0; }
-        .radar-box { height: 320px; width: 100%; }
-        .bar-box { height: 380px; width: 100%; }
-        .detail-card { background: white; padding: 25px; border-radius: 25px; border-left: 6px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
-        .advice-box { background: #F8FBFF; padding: 15px; border-radius: 15px; border: 1px dashed var(--secondary); margin-top: 15px; }
+        .options label:has(input:checked) { border-color: var(--primary); background: #FFF9F9; box-shadow: 0 4px 12px rgba(255,118,117,0.08); }
+
+        .btn-submit {
+            width: 100%; padding: 22px; background: linear-gradient(135deg, #FF7675, #FF9F9E);
+            color: white; border: none; border-radius: 24px; font-size: 20px;
+            font-weight: 800; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 15px 30px rgba(255,118,117,0.3);
+        }
+
+        
+        #report { display: none; margin-top: 50px; animation: fadeIn 0.8s ease; }
+        .report-card { background: white; border-radius: 30px; padding: 30px; margin-bottom: 25px; border: 1px solid #F1F2F6; }
+        
+        .res-headline { text-align: center; margin-bottom: 30px; }
+        .res-headline h2 { font-size: 32px; color: var(--primary); margin: 5px 0; }
+        
+        .section-title { 
+            display: flex; align-items: center; font-size: 18px; font-weight: 800; 
+            margin-bottom: 20px; color: #2D3436; 
+        }
+        .section-title::before { content: ""; width: 6px; height: 20px; background: var(--primary); border-radius: 3px; margin-right: 12px; }
+
+        .analysis-text { color: var(--text-sub); font-size: 15px; line-height: 1.8; text-align: justify; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag { padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .tag-p { background: rgba(255,118,117,0.1); color: var(--primary); }
+        .tag-s { background: rgba(116,185,255,0.1); color: var(--secondary); }
+
+        .advice-item { background: #F8F9FA; padding: 15px; border-radius: 15px; margin-bottom: 12px; font-size: 14px; border-left: 4px solid var(--secondary); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
+<body oncontextmenu="return false">
 
 <div id="auth-overlay">
     <div class="auth-box">
-        <h2>测评验证</h2>
-        <p style="color:#BBB; font-size:12px; margin-top:10px;">请输入授权码以开启测评</p>
-        <input type="password" id="auth-input" placeholder="输入授权码" inputmode="numeric" autocomplete="off">
-        <button id="auth-btn">立即开启</button>
+        <h2>🔒 授权访问</h2>
+        <div class="badge">SECURE ASSESSMENT</div>
+        <input type="password" id="auth-input" placeholder="输入验证码" inputmode="numeric">
+        <button id="auth-btn">解锁深度评估报告</button>
     </div>
 </div>
 
 <div id="main-content">
-    <header><h1>🌱 幼儿潜力深度测评</h1><div class="subtitle">耶鲁大学多维行为观察体系</div></header>
-    <form id="quizForm"><div id="questions-container"></div></form>
-    <button class="btn-submit" onclick="generateReport()">生成潜力报告</button>
+    <header>
+        <h1>🌱 幼儿潜力深度测评</h1>
+        <div class="badge">3 - 4 岁关键期专用</div>
+    </header>
+
+    <div id="questions-container"></div>
+    <button class="btn-submit" onclick="generateReport()">查看潜力分析报告</button>
+
     <div id="report">
-        <div class="result-header"><span>核心潜力指向</span><h2 id="res-title"></h2></div>
-        <div class="chart-container"><div class="radar-box"><canvas id="radarChart"></canvas></div></div>
-        <div class="chart-container"><div class="bar-box"><canvas id="barChart"></canvas></div></div>
-        <div class="detail-card"><h3 style="color:var(--primary);">✨ 深度信号解读</h3><p id="res-desc"></p>
-            <div class="advice-box"><b style="color:var(--secondary)">💡 培养建议：</b><br><span id="res-advice"></span></div>
+        <div class="report-card res-headline">
+            <span style="color:#A0A0A0; font-size:14px; letter-spacing:2px;">测评结果显示核心天赋为</span>
+            <h2 id="res-title"></h2>
+            <div id="res-tags" class="tag-container" style="justify-content:center; margin-top:15px;"></div>
         </div>
+
+        <div class="report-card">
+            <div class="section-title">多维潜力图谱</div>
+            <div class="radar-box"><canvas id="radarChart"></canvas></div>
+        </div>
+
+        <div class="report-card">
+            <div class="section-title">天赋深度解读</div>
+            <div id="res-desc" class="analysis-text"></div>
+        </div>
+
+        <div class="report-card">
+            <div class="section-title">个性化培养策略</div>
+            <div id="res-advice"></div>
+        </div>
+        
+        <p style="text-align:center; font-size:12px; color:#CCC; margin:40px 0;">基于多元智能理论与发展心理学模型</p>
     </div>
 </div>
 
 <script>
-/**
- * 加固版
- */
 (function() {
     
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-    };
-    
-    
-    setInterval(function() { (function(c) { (function(a) { if (a) { (function b() { }).constructor("debugger")(); } else { (function b() { }).constructor("debugger")(); } })(c); })(true); }, 2000);
-
-    const _0x1a2b = ["MDUyMA==", "bGluZ3Vpc3RpYw==", "bG9naWNhbA==", "c3BhdGlhbA==", "bXVzaWNhbA==", "a2luZXN0aGV0aWM=", "aW50ZXJwZXJzb25hbA=="]; 
-    const decode = (s) => atob(s);
+    const _c = ["MDUyMA==", "bGluZ3Vpc3RpYw==", "bG9naWNhbA==", "c3BhdGlhbA==", "bXVzaWNhbA==", "a2luZXN0aGV0aWM=", "aW50ZXJwZXJzb25hbA=="];
+    const d = (s) => atob(s);
 
     window.onload = function() {
-        const authBtn = document.getElementById('auth-btn');
-        authBtn.addEventListener('click', function() {
-            if(document.getElementById('auth-input').value === decode(_0x1a2b[0])) {
+        document.getElementById('auth-btn').onclick = function() {
+            if(document.getElementById('auth-input').value === d(_c[0])) {
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-                renderQs();
+                initQuiz();
             } else { alert("验证码无效"); }
-        });
+        };
     };
 
-    // 核心题库
-    const qRaw = [
-        ["当孩子想表达需求时，是否能自如更换词汇？", "经常如此", "偶尔变换", "直接指点", _0x1a2b[1], _0x1a2b[6], _0x1a2b[5]],
-        ["孩子是否能迅速察觉大人细微的情绪波动？", "极其敏感", "会注意到", "不太关注", _0x1a2b[6], _0x1a2b[1], _0x1a2b[2]],
-        ["是否喜欢将玩具按某种逻辑自发排序？", "经常如此", "偶尔模仿", "没兴趣", _0x1a2b[2], _0x1a2b[3], _0x1a2b[5]],
-        ["听到陌生节奏，能否准确复刻拍打？", "几乎百分百", "模仿大概", "无明显兴趣", _0x1a2b[4], _0x1a2b[5], _0x1a2b[3]],
-        ["在遮挡部分内容时，能否脑补物体全貌？", "空间感极佳", "需要提示", "关注细节", _0x1a2b[3], _0x1a2b[2], _0x1a2b[1]],
-        ["学习平衡车等动作的协调速度如何？", "非常快", "反复练习", "倾向静坐", _0x1a2b[5], _0x1a2b[3], _0x1a2b[2]],
-        ["是否经常自言自语编造故事剧本？", "经常如此", "模仿情节", "机械动作", _0x1a2b[1], _0x1a2b[6], _0x1a2b[5]],
-        ["面对无法拆卸的玩具，是否研究其结构？", "研究因果", "求助暴力", "观察外观", _0x1a2b[2], _0x1a2b[6], _0x1a2b[3]],
-        ["在陌生环境中，能否判断谁是‘小领袖’？", "洞察力强", "边缘观察", "完全不关注", _0x1a2b[6], _0x1a2b[1], _0x1a2b[2]],
-        ["能否分辨两个极相近的声音差异？", "分辨力高", "分清明显差异", "不敏感", _0x1a2b[4], _0x1a2b[2], _0x1a2b[5]],
-        ["在户外是否能记住回家的路或标志？", "路感极佳", "偶尔走错", "完全依赖", _0x1a2b[3], _0x1a2b[5], _0x1a2b[6]],
-        ["对手部精细动作是否有持久耐心？", "掌控力强", "容易放弃", "喜欢大动作", _0x1a2b[5], _0x1a2b[2], _0x1a2b[5]],
-        ["听到新词后能否立即活学活用？", "迁移力强", "需多次解释", "不感兴趣", _0x1a2b[1], _0x1a2b[6], _0x1a2b[4]],
-        ["是否对‘为什么’背后的因果极度认真？", "穷追不舍", "随口一问", "动手改", _0x1a2b[2], _0x1a2b[1], _0x1a2b[5]],
-        ["看绘本能否发现极其微小的逻辑错误？", "细节观察强", "看主线", "关注翻页", _0x1a2b[3], _0x1a2b[1], _0x1a2b[5]],
-        ["面对小朋友哭泣能否主动安慰？", "主动解决", "冷漠观察", "跟着哭", _0x1a2b[6], _0x1a2b[2], _0x1a2b[4]],
-        ["是否尝试在乐器上寻找听到的音阶？", "尝试欲望强", "乱敲", "听而不动", _0x1a2b[4], _0x1a2b[5], _0x1a2b[3]],
-        ["是否表现出鞋头朝外等强迫秩序感？", "秩序感强", "被动接受", "无秩序感", _0x1a2b[2], _0x1a2b[6], _0x1a2b[3]],
-        ["表达时是否善用形容词（巨大的等）？", "非常擅长", "简短直接", "手势代替", _0x1a2b[1], _0x1a2b[5], _0x1a2b[3]],
-        ["玩拼图能否直接通过形状判断位置？", "直接判断", "不断试错", "没耐心", _0x1a2b[3], _0x1a2b[2], _0x1a2b[5]],
-        ["运动中能否准确避开障碍物距离？", "预估准确", "经常撞到", "动作笨拙", _0x1a2b[5], _0x1a2b[3], _0x1a2b[2]],
-        ["是否通过观察大人神色来决定表现？", "察言观色强", "沉浸自我", "吵闹关注", _0x1a2b[6], _0x1a2b[2], _0x1a2b[1]],
-        ["是否会给玩偶起名并进行对话？", "起名对话", "简单玩耍", "拆卸研究", _0x1a2b[1], _0x1a2b[6], _0x1a2b[2]],
-        ["听到不同情绪音乐是否产生对应反应？", "立刻反应", "只爱快节奏", "无反应", _0x1a2b[4], _0x1a2b[5], _0x1a2b[3]],
-        ["是否对规则和公平性极其在意？", "非常在意", "争抢驱动", "听从安排", _0x1a2b[2], _0x1a2b[5], _0x1a2b[6]],
-        ["能否模仿复杂表情并自如切换？", "切换自如", "模仿生硬", "不会模仿", _0x1a2b[5], _0x1a2b[6], _0x1a2b[3]],
-        ["涂鸦或搭积木是否对对称性有偏好？", "明显偏好", "随意堆砌", "听指挥", _0x1a2b[3], _0x1a2b[5], _0x1a2b[6]],
-        ["能否自发进行轮流等待或谈判？", "自主谈判", "直接争抢", "放弃", _0x1a2b[6], _0x1a2b[5], _0x1a2b[2]],
-        ["能否通过局部特征认出卡通人物？", "快速识别", "需看全身", "无印象", _0x1a2b[3], _0x1a2b[1], _0x1a2b[2]],
-        ["身体是否会不由自主随节拍律动？", "潜意识律动", "需提醒", "无节拍感", _0x1a2b[4], _0x1a2b[5], _0x1a2b[1]]
+    const qData = [
+        ["当孩子想表达需求时，是否能自如地更换词汇？（如：从'我想吃'变成'我肚子饿了'）", "经常如此，表达灵活自如", "偶尔变换，多数使用固定词汇", "直接指认，不喜欢用词", d(_c[1]), d(_c[6]), d(_c[5])],
+        ["孩子是否能捕捉大人微妙的情绪变化？", "极其敏锐", "偶尔察觉", "完全不关注", d(_c[6]), d(_c[1]), d(_c[2])],
+        ["是否喜欢将玩具按颜色、大小或某种逻辑自发排序？", "经常如此", "偶尔模仿大人简单分类", "更喜欢乱丢推倒", d(_c[2]), d(_c[3]), d(_c[5])],
+        ["听到陌生的节奏如（心跳、敲门），能否准确复刻？", "百分百精准复刻", "能模仿大概，不精准", "对声音无反应无兴趣", d(_c[4]), d(_c[5]), d(_c[3])],
+        ["对于复杂的结构，孩子是否能在被挡住一部分时通过大脑‘补全’全貌？", "可以，空间感极佳", "需提示", "只关注眼前的细节", d(_c[3]), d(_c[2]), d(_c[1])],
+        ["学习平衡车等动作的身体协调速度？", "上手极快", "需要反复练习", "更喜欢安静的脑力活动", d(_c[5]), d(_c[3]), d(_c[2])],
+        ["是否经常自言自语编造故事剧本？", "经常沉浸在自编剧本中", "会模仿现有的动画情节", "没兴趣，更喜欢其他活动", d(_c[1]), d(_c[6]), d(_c[5])],
+        ["面对一个‘无法拆卸’的玩具，孩子是否会尝试从不同角度研究它的逻辑关联？", "专注研究逻辑和结构", "求助他人或暴力拆卸", "转而观察外观颜色等", d(_c[2]), d(_c[6]), d(_c[3])],
+        ["在新游乐场中，孩子是否能迅速判断谁是‘带头人’并尝试互动？", "洞察力强，社交适应极快", "慢热，在边缘观察很久", "不关注，独自玩耍", d(_c[6]), d(_c[1]), d(_c[2])],
+        ["是否能准确分辨出两个音调极其相近的声音（如不同水杯的敲击声）？", "听觉灵敏,分辨力高", "能分清不同的声音", "不敏感", d(_c[4]), d(_c[2]), d(_c[5])],
+        ["在户外行走时，孩子是否能记住回家的路或路上的标志性建筑？", "方向感极佳", "大概记得，偶尔迷糊", "依赖大人带路", d(_c[3]), d(_c[5]), d(_c[6])],
+        ["孩子对手部精细动作（如穿珠子、折纸、用筷子）是否表现出耐心？", "是，掌控力强", "会尝试，容易受挫", "没耐心，更喜欢大动作", d(_c[5]), d(_c[2]), d(_c[5])],
+        ["当孩子听到一个新词汇时，是否能很快在接下来的对话中‘活学活用’？", "活学活用", "需多大人多次解释", "对新词不感兴趣", d(_c[1]), d(_c[6]), d(_c[4])],
+        ["孩子是否喜欢询问‘为什么’，且对答案中的因果关系表现得非常认真？", "逻辑思维活跃，穷追不舍", "随口一问，不在意答案", "比起问问题，更喜欢动手", d(_c[2]), d(_c[1]), d(_c[5])],
+        ["看绘本能否发现画面的微小逻辑错误或视觉差异？", "细节控", "看大意", "不关注细节", d(_c[3]), d(_c[1]), d(_c[5])],
+        ["面对他人哭泣，能否自发进行安慰？", "可以，同理心强", "会手足无措或冷漠离开", "被对方带哭", d(_c[6]), d(_c[2]), d(_c[4])],
+        ["听到一段旋律后，孩子是否会尝试在玩具乐器上寻找相应的音阶？", "尝试欲强", "乱敲一气", "不关注", d(_c[4]), d(_c[5]), d(_c[3])],
+        ["生活习惯中是否表现出明显的秩序感？（如鞋子必须整齐朝外）？", "有自己的明显强迫秩序", "被动接受大人的规矩", "完全随性无序", d(_c[2]), d(_c[6]), d(_c[3])],
+        ["在解释事情时，孩子是否能绘声绘色地加入形容词（如：巨大的、闪闪的）？", "擅长使用，绘声绘色", "表述简短直接", "用夸张手势替代文字", d(_c[1]), d(_c[5]), d(_c[3])],
+        ["玩拼图时能否一眼识破形状的关联？", "预判力强", "不断试错", "没耐心", d(_c[3]), d(_c[2]), d(_c[5])],
+        ["运动中能否精准预估自己与障碍的距离？（避免碰撞）", "预判准确", "经常碰撞", "通常能避免，但动作小心笨拙，", d(_c[5]), d(_c[3]), d(_c[2])],
+        ["家里来了客人，孩子是否能通过观察大人的神色来决定‘表现’？", "非常会察言观色", "沉浸在自己的世界", "通过吵闹引起大家注意", d(_c[6]), d(_c[2]), d(_c[1])],
+        ["是否会给家具或玩偶起正式的名字，并和它们‘对话’？", "会起名或对话", "只是简单玩耍", "更喜欢拆卸破坏", d(_c[1]), d(_c[6]), d(_c[2])],
+        ["听到悲伤或欢快音乐是否有情绪反馈（如：为什么他有我没有）？", "反馈明显", "只听节奏", "无反应", d(_c[4]), d(_c[5]), d(_c[3])],
+        ["是否对公平性和既定规则非常敏感？", "极度在意", "偶尔会争抢", "听从大人安排", d(_c[2]), d(_c[5]), d(_c[6])],
+        ["能否模仿复杂表情并迅速切换？", "模仿达人", "模仿得比较生硬", "几乎不模仿", d(_c[5]), d(_c[6]), d(_c[3])],
+        ["涂鸦或搭积木是否对对称感有执念？", "执着对称", "随意堆叠", "听大人指挥", d(_c[3]), d(_c[5]), d(_c[6])],
+        ["需要轮流玩玩具时，孩子是否能自发性地进行‘等待’或‘谈判’？", "技巧型自主谈判", "直接抢夺", "放弃不玩", d(_c[6]), d(_c[5]), d(_c[2])],
+        ["能否通过局部特征快速认出熟悉的卡通人物？", "能快速识别", "要看全身才能识别", "对图像内容没印象", d(_c[3]), d(_c[1]), d(_c[2])],
+        ["身体是否会不由自主随背景乐摆动？", "潜意识会跟着摆动", "需提醒才会跟着做", "无反应", d(_c[4]), d(_c[5]), d(_c[1])]
     ];
 
-    function renderQs() {
-        const c = document.getElementById('questions-container');
-        qRaw.forEach((q, i) => {
-            let d = document.createElement('div');
-            d.className = 'question';
-            d.innerHTML = `<p>${i+1}. ${q[0]}</p><div class="options">
-                <label><input type="radio" name="q${i}" value="${decode(q[4])}"><span>${q[1]}</span></label>
-                <label><input type="radio" name="q${i}" value="${decode(q[5])}"><span>${q[2]}</span></label>
-                <label><input type="radio" name="q${i}" value="${decode(q[6])}"><span>${q[3]}</span></label>
+    function initQuiz() {
+        const container = document.getElementById('questions-container');
+        qData.forEach((q, i) => {
+            let item = document.createElement('div');
+            item.className = 'question';
+            item.innerHTML = `<p>${i+1}. ${q[0]}</p><div class="options">
+                <label><input type="radio" name="q${i}" value="${q[4]}"><span>${q[1]}</span></label>
+                <label><input type="radio" name="q${i}" value="${q[5]}"><span>${q[2]}</span></label>
+                <label><input type="radio" name="q${i}" value="${q[6]}"><span>${q[3]}</span></label>
             </div>`;
-            c.appendChild(d);
+            container.appendChild(item);
         });
     }
+
+    const dict = {
+        linguistic: {
+            title: "卓越语言家 (Linguistic)",
+            tags: ["语义敏感", "叙事天赋", "高迁移力"],
+            desc: "您的孩子展现出超越同龄人的语言编码能力。这不仅体现在词汇储备量上，更重要的是‘语境重组’能力。他们善于捕捉语音中的情感色彩，并能精准地通过语言影响他人。这是阅读、写作以及跨文化沟通的天然基石。他们的大脑在处理语言符号时非常活跃，能够快速建立词汇与复杂情绪之间的关联。",
+            advice: [
+                "<b>【绘本深度化】</b>：不再满足于讲故事，尝试‘角色反转’，让孩子主导情节走向。",
+                "<b>【外语敏感期】</b>：此阶段是第二语言介入的黄金期，重点在于纯正语音的输入而非单词记忆。",
+                "<b>【演讲舞台】</b>：多提供在成人面前表达的机会，建立自信的表达力。"
+            ]
+        },
+        logical: {
+            title: "逻辑思想者 (Logical)",
+            tags: ["秩序感", "因果溯源", "策略萌芽"],
+            desc: "您的孩子是一个天生的‘规则探寻者’。他们对世界如何运行充满了逻辑上的好奇。表现为极强的分类能力和对数字、比例的本能敏感。这种天赋预示着在数学、计算机科学以及系统化管理方面的潜力。他们更关注事物的内在关联，而非表面现象，具有极强的批判性思维雏形。",
+            advice: [
+                "<b>【数理游戏】</b>：引入带有数理逻辑的桌游，如简易迷宫或逻辑拼插。",
+                "<b>【生活实验室】</b>：在烹饪或修补物品时带上孩子，解释其中的因果关系。",
+                "<b>【尊重秩序】</b>：理解孩子对规则的‘执拗’，这是他们在建立心理安全感和世界模型。"
+            ]
+        },
+        spatial: {
+            title: "空间建模师 (Spatial)",
+            tags: ["视觉渲染", "几何直觉", "方位感知"],
+            desc: "您的孩子大脑中拥有一个强大的‘视觉显示卡’。他们能自如地在脑海中旋转物体、重构空间。这种能力在建筑设计、艺术创作、临床医学等领域至关重要。他们能从杂乱的视觉信号中提取核心特征，并对色彩与形态的和谐度有天然的感知力。",
+            advice: [
+                "<b>【立体建构】</b>：提供乐高、磁力片等三维工具，鼓励从模仿图纸到自创结构。",
+                "<b>【户外探索】</b>：通过认路、手绘地图等活动强化方位感。",
+                "<b>【视觉艺术】</b>：不要限制绘画的技巧，让他们自由表达大脑中的空间构思。"
+            ]
+        },
+        musical: {
+            title: "旋律感知者 (Musical)",
+            tags: ["绝对音感潜质", "节奏记忆", "情感共鸣"],
+            desc: "孩子对声音信号有着极高的过滤与处理权重。他们能精准捕捉环境中的微小声学特征，并将其转化为内心的情感。这种天赋不仅仅关乎音乐创作，更代表了一种极佳的听觉学习能力和极强的同理心基石。他们往往能通过声音辨别他人的真实情绪状态。",
+            advice: [
+                "<b>【器乐触碰】</b>：让孩子接触不同材质的乐器（打击、拨弦等），感受振动与音色的关联。",
+                "<b>【律动教育】</b>：学习专业的奥尔夫音乐教育，将动作与节奏深度耦合。",
+                "<b>【多维声场】</b>：播放不同民族、不同风格的音乐，建立宏大的音感库。"
+            ]
+        },
+        kinesthetic: {
+            title: "身心协作者 (Kinesthetic)",
+            tags: ["精准运动", "身体智慧", "触觉学习"],
+            desc: "孩子具备极高的运动觉知能力。这意味着大脑对肌肉群的控制极其精细，且反馈周期极短。这是外科医生、专业运动员或精密制造专家的核心潜质。他们往往‘坐不住’，因为他们是通过身体接触和动作体验来处理信息的。触觉是他们认知的核心触角。",
+            advice: [
+                "<b>【专业体适能】</b>：引入体操、轮滑等对平衡与协调要求极高的运动。",
+                "<b>【精密手工】</b>：进行粘土、木工小件制作，磨炼精细动作的耐受力。",
+                "<b>【情境演绎】</b>：在学习新知识时，鼓励通过肢体动作来加深记忆。"
+            ]
+        },
+        interpersonal: {
+            title: "社交洞察者 (Interpersonal)",
+            tags: ["共情专家", "领袖特质", "冲突管理"],
+            desc: "您的孩子是天生的社交枢纽。他们拥有卓越的非语言信号读取能力，能瞬间识别他人的需求并给出反馈。这种‘高情商’特质在未来的管理、公共服务、心理咨询等领域将成为其核心竞争力。他们善于调配资源，通过谈判和共情来实现群体目标，具备很强的说服力。",
+            advice: [
+                "<b>【模拟社交】</b>：通过角色扮演练习复杂的社交场景（如拒绝、求助、分享）。",
+                "<b>【群体活动】</b>：鼓励参与具有竞争与合作性质的小组活动，观察并引导其领导行为。",
+                "<b>【情感教育】</b>：帮助孩子命名复杂的社会情绪，提升其共情层次。"
+            ]
+        }
+    };
 
     window.generateReport = function() {
-        const rs = document.querySelectorAll('input[type="radio"]:checked');
-        if(rs.length < 30) { alert("测评尚未完成"); return; }
-        let s = { linguistic:0, logical:0, spatial:0, musical:0, kinesthetic:0, interpersonal:0 };
-        rs.forEach(r => s[r.value]++);
+        const sel = document.querySelectorAll('input[type="radio"]:checked');
+        if(sel.length < 30) { alert(`测评还差 ${30-sel.length} 题，请完成后再查看结果。`); return; }
         
-        const dict = {
-            linguistic: ["语言天才", "具备出色的语境迁移与叙事潜质。", "多读绘本，鼓励自主续编故事。"],
-            logical: ["逻辑思想者", "对因果关系与秩序规则高度敏感。", "引入编程启蒙与数学逻辑游戏。"],
-            spatial: ["空间建模师", "视觉渲染与空间还原能力极佳。", "提供复杂拼插玩具与绘画训练。"],
-            musical: ["乐感敏感期", "具备极佳的节奏感知与音准潜力。", "接触乐器，通过律动感受古典乐。"],
-            kinesthetic: ["运动协作者", "手脑配合与身体控制精准度高。", "开展平衡车运动与精细手工。"],
-            interpersonal: ["社交洞察者", "具备共情能力与潜在领袖气质。", "参加群体合作，练习换位思考。"]
-        };
-
+        let s = { linguistic:0, logical:0, spatial:0, musical:0, kinesthetic:0, interpersonal:0 };
+        sel.forEach(r => s[r.value]++);
+        
         const top = Object.keys(s).sort((a,b) => s[b]-s[a])[0];
-        document.getElementById('res-title').innerText = dict[top][0];
-        document.getElementById('res-desc').innerText = dict[top][1];
-        document.getElementById('res-advice').innerText = dict[top][2];
+        const res = dict[top];
 
-        const labels = ['语言', '逻辑', '空间', '音乐', '运动', '社交'];
-        const values = [s.linguistic, s.logical, s.spatial, s.musical, s.kinesthetic, s.interpersonal];
-
-        if(charts.r) charts.r.destroy();
-        if(charts.b) charts.b.destroy();
-
-        charts.r = new Chart(document.getElementById('radarChart'), {
-            type: 'radar',
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: 'rgba(255, 118, 117, 0.2)', borderColor: '#FF7675', borderWidth: 3 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+        document.getElementById('res-title').innerText = res.title;
+        document.getElementById('res-desc').innerText = res.desc;
+        
+        // 渲染标签
+        const tagBox = document.getElementById('res-tags');
+        tagBox.innerHTML = '';
+        res.tags.forEach(t => {
+            const span = document.createElement('span');
+            span.className = 'tag tag-p';
+            span.innerText = t;
+            tagBox.appendChild(span);
         });
 
-        charts.b = new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#FF7675', '#74B9FF', '#55E6C1', '#FDCB6E', '#A29BFE', '#FAB1A0'], borderRadius: 10 }] },
-            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
-        });
+        // 渲染建议
+        const advBox = document.getElementById('res-advice');
+        advBox.innerHTML = res.advice.map(a => `<div class="advice-item">${a}</div>`).join('');
+
+        // 渲染图表
+        renderCharts(s);
 
         document.getElementById('report').style.display = 'block';
-        setTimeout(() => window.scrollTo({ top: document.getElementById('report').offsetTop - 30, behavior: 'smooth' }), 100);
+        window.scrollTo({ top: document.getElementById('report').offsetTop - 20, behavior: 'smooth' });
+    };
+
+    function renderCharts(s) {
+        const labels = ['语言表达', '数理逻辑', '空间视觉', '音乐律动', '肢体运动', '人际社交'];
+        const values = [s.linguistic, s.logical, s.spatial, s.musical, s.kinesthetic, s.interpersonal];
+        
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: 'rgba(255, 118, 117, 0.15)',
+                    borderColor: '#FF7675',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { r: { min: 0, max: 12, ticks: { display: false }, grid: { color: '#eee' }, angleLines: { color: '#eee' } } },
+                plugins: { legend: { display: false } }
+            }
+        });
     }
-    let charts = {};
 })();
 </script>
 </body>
